@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 public class TasksController {
-    private TasksService tasksService;
+    private final TasksService tasksService;
 
     public TasksController(@Autowired TasksService tasksService) {
         this.tasksService = tasksService;
@@ -55,7 +55,7 @@ public class TasksController {
     /**
      * Get a task by id
      *
-     * @param id
+     * @param id Task id to get
      * @return Task object
      */
     @GetMapping("/tasks/{id}")
@@ -117,6 +117,20 @@ public class TasksController {
         return ResponseEntity.ok(newNote);
     }
 
+    /**
+     * Delete a note from a task
+     *
+     * @param id      Task id
+     * @param noteId  Note id
+     * @return Note object deleted
+     */
+    @DeleteMapping("/tasks/{id}/notes/{noteId}")
+    ResponseEntity<Note> deleteNoteFromTask(@PathVariable("id") Integer id, @PathVariable("noteId") Integer noteId) {
+        var deletedNote =  tasksService.deleteNoteFromTask(id,noteId);
+        return ResponseEntity.ok(deletedNote);
+    }
+
+
     @ExceptionHandler(TasksService.TaskNotFoundException.class)
     ResponseEntity<ErrorResponse> handleErrors(Exception e) {
         return new ResponseEntity<>(
@@ -125,5 +139,12 @@ public class TasksController {
         );
     }
 
+    @ExceptionHandler(TasksService.NoteNotFoundException.class)
+    ResponseEntity<ErrorResponse> handleErrorsNote(Exception e) {
+        return new ResponseEntity<>(
+                new ErrorResponse(e.getMessage()),
+                HttpStatus.NOT_FOUND
+        );
+    }
 
 }

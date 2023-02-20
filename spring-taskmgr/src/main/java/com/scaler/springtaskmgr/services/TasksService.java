@@ -13,10 +13,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TasksService {
     private final List<Task> taskList;
 
-    private HashMap<Integer, List<Note>> noteTaskMap;
-    private AtomicInteger taskId = new AtomicInteger(0);
+    private final HashMap<Integer, List<Note>> noteTaskMap;
+    private final AtomicInteger taskId = new AtomicInteger(0);
 
-    private AtomicInteger noteId = new AtomicInteger(0);
+    private final AtomicInteger noteId = new AtomicInteger(0);
 
     public static class TaskNotFoundException extends IllegalArgumentException {
         public TaskNotFoundException(Integer id) {
@@ -31,11 +31,11 @@ public class TasksService {
         taskList.add(new Task(taskId.incrementAndGet(), "Task 3", "Description 3", "2021-01-01"));
 
         noteTaskMap = new HashMap<>();
-        noteTaskMap.put(1, new ArrayList<Note>());
+        noteTaskMap.put(1, new ArrayList<>());
         for (int i=0;i<3; i++) {
             noteTaskMap.get(1).add(new Note(noteId.incrementAndGet(), "Note - "+i));
         }
-        noteTaskMap.put(2, new ArrayList<Note>());
+        noteTaskMap.put(2, new ArrayList<>());
         for (int i=0;i<3; i++) {
             noteTaskMap.get(2).add(new Note(noteId.incrementAndGet(), "Note - "+i));
         }
@@ -95,7 +95,7 @@ public class TasksService {
         if (noteTaskMap.containsKey(id)) {
             noteTaskMap.get(id).add(newNote);
         } else {
-            noteTaskMap.put(id, new ArrayList<Note>());
+            noteTaskMap.put(id, new ArrayList<>());
             noteTaskMap.get(id).add(newNote);
         }
         return newNote;
@@ -105,7 +105,11 @@ public class TasksService {
         return noteTaskMap.get(id);
     }
 
-    public HashMap<Integer, List<Note>> getNotes() {
-        return noteTaskMap;
+    public Note deleteNoteFromTask(Integer taskId, Integer noteId) {
+        var note = noteTaskMap.get(taskId).stream()
+                .filter(n -> n.getNoteId().equals(noteId)).findFirst()
+                .orElseThrow(() -> new NoteNotFoundException(noteId));
+        noteTaskMap.get(taskId).remove(note);
+        return note;
     }
 }
