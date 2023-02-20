@@ -1,6 +1,7 @@
 package com.scaler.springtaskmgr.controllers;
 
 import com.scaler.springtaskmgr.dtos.ErrorResponse;
+import com.scaler.springtaskmgr.entities.Note;
 import com.scaler.springtaskmgr.entities.Task;
 import com.scaler.springtaskmgr.services.TasksService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +92,31 @@ public class TasksController {
         return ResponseEntity.accepted().body(updatedTask);
     }
 
+    /**
+     * Get all notes for a task
+     *
+     * @param id Task id
+     * @return List of notes
+     */
+    @GetMapping("/tasks/{id}/notes")
+    ResponseEntity<List<Note>> getNotes(@PathVariable("id") Integer id) {
+        return ResponseEntity.ok(tasksService.getNotesByTaskId(id));
+    }
+
+
+    /**
+     * Add a note to a task
+     *
+     * @param id   Task id
+     * @param note Note object sent by client
+     * @return Note object created
+     */
+    @PostMapping("/tasks/{id}/notes")
+    ResponseEntity<Note> addNoteToTask(@PathVariable("id") Integer id, @RequestBody Note note) {
+        var newNote =  tasksService.addNoteToTask(id,note.getNoteBody());
+        return ResponseEntity.ok(newNote);
+    }
+
     @ExceptionHandler(TasksService.TaskNotFoundException.class)
     ResponseEntity<ErrorResponse> handleErrors(Exception e) {
         return new ResponseEntity<>(
@@ -98,4 +124,6 @@ public class TasksController {
                 HttpStatus.NOT_FOUND
         );
     }
+
+
 }

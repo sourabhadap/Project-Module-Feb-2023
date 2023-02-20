@@ -15,6 +15,10 @@ public class Task {
         this.dueDate = dueDate;
     }
 
+    public Task() {
+
+    }
+
     public void setId(Integer id) {
         this.id = id;
     }
